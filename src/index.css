@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0e1e;
+}
+::-webkit-scrollbar-thumb {
+  background: #2b335a;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff9ebb;
+}
+
+/* Dream glow utilities */
+.glow-pink {
+  box-shadow: 0 0 25px rgba(255, 158, 187, 0.45);
+}
+.glow-star {
+  box-shadow: 0 0 25px rgba(255, 209, 102, 0.45);
+}
+.glow-moon {
+  box-shadow: 0 0 35px rgba(255, 234, 167, 0.55);
+}
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(112, 214, 255, 0.45);
+}
+
+/* Early web scanline / dot texture overlay */
+.retro-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-size: 20px 20px;
+}
