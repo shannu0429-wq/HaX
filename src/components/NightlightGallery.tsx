@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LanternItem } from '../types';
-import { Moon, Sparkles, Cloud, Lightbulb, Compass, Zap } from 'lucide-react';
+import { Moon, Sparkles, Cloud, Lightbulb, Sliders, Sun } from 'lucide-react';
 import { soundEngine } from '../utils/sound';
 
 interface NightlightGalleryProps {
@@ -40,6 +40,7 @@ const LANTERNS: LanternItem[] = [
 
 export const NightlightGallery: React.FC<NightlightGalleryProps> = ({ onInteract }) => {
   const [selectedId, setSelectedId] = useState<string>('crescent-moon');
+  const [luminance, setLuminance] = useState<number>(75);
   const selectedLantern = LANTERNS.find((l) => l.id === selectedId) || LANTERNS[0];
 
   const handleSelect = (lantern: LanternItem) => {
@@ -50,19 +51,40 @@ export const NightlightGallery: React.FC<NightlightGalleryProps> = ({ onInteract
 
   return (
     <section id="nightlights" className="py-12 px-4 md:px-8 max-w-5xl mx-auto">
-      <div className="bg-gradient-to-b from-[#141830] to-[#0c0e1e] rounded-3xl p-6 md:p-10 border border-white/10 shadow-2xl relative">
+      <div className="glass-panel rounded-3xl p-6 md:p-10 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.6)] relative">
         {/* Header */}
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-2">
-            <Lightbulb className="w-3.5 h-3.5" />
-            <span>Showcase Project 02 · Luminescence Craft</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold mb-2 border border-amber-400/30">
+              <Lightbulb className="w-3.5 h-3.5" />
+              <span>Showcase Project 02 · Luminescence Craft</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-white font-nursery">
+              The Nightlight Collection <span className="text-amber-300 font-normal">🏮</span>
+            </h2>
+            <p className="text-sm text-slate-300 mt-1 max-w-lg">
+              Bedside lanterns engineered by Pip so night creatures feel safe. Test the live ambient dimmer below!
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-nursery">
-            The Nightlight Collection 🏮
-          </h2>
-          <p className="text-sm text-slate-300 mt-1 max-w-lg">
-            Bedside lamps engineered by Pip so little spirits never have to fear the dark. Click to test illumination!
-          </p>
+
+          {/* Interactive Luminescence Slider */}
+          <div className="glass-card px-4 py-2.5 rounded-2xl flex items-center gap-3 border border-white/10">
+            <Sliders className="w-4 h-4 text-amber-300" />
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between text-[10px] text-slate-300 font-bold">
+                <span>DIMMER</span>
+                <span className="font-mono text-amber-300">{luminance}%</span>
+              </div>
+              <input
+                type="range"
+                min="20"
+                max="100"
+                value={luminance}
+                onChange={(e) => setLuminance(Number(e.target.value))}
+                className="w-28 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-300"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Lantern Selector Tabs */}
@@ -75,14 +97,14 @@ export const NightlightGallery: React.FC<NightlightGalleryProps> = ({ onInteract
                 onClick={() => handleSelect(lantern)}
                 className={`p-4 rounded-2xl border text-left transition-all active:scale-95 ${
                   isSelected
-                    ? 'bg-white/10 border-white/40 shadow-xl'
-                    : 'bg-white/5 border-white/10 hover:border-white/20'
+                    ? 'glass-card border-white/40 shadow-2xl scale-[1.02]'
+                    : 'glass-card hover:border-white/25 opacity-70 hover:opacity-100'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-bold"
-                    style={{ backgroundColor: `${lantern.color}30`, color: lantern.color }}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center font-bold shadow-md"
+                    style={{ backgroundColor: `${lantern.color}25`, color: lantern.color }}
                   >
                     {lantern.id === 'crescent-moon' && <Moon className="w-4 h-4" />}
                     {lantern.id === 'star-jar' && <Sparkles className="w-4 h-4" />}
@@ -92,7 +114,7 @@ export const NightlightGallery: React.FC<NightlightGalleryProps> = ({ onInteract
                     className="w-2.5 h-2.5 rounded-full"
                     style={{
                       backgroundColor: lantern.color,
-                      boxShadow: isSelected ? `0 0 10px ${lantern.color}` : 'none',
+                      boxShadow: isSelected ? `0 0 12px ${lantern.color}` : 'none',
                     }}
                   />
                 </div>
@@ -103,66 +125,68 @@ export const NightlightGallery: React.FC<NightlightGalleryProps> = ({ onInteract
           })}
         </div>
 
-        {/* Active Lantern Showcase Display Stage */}
-        <div className="relative rounded-2xl bg-black/40 border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
-          {/* Dynamic Illumination Radial Aura */}
+        {/* Active Lantern Showcase Stage */}
+        <div className="relative rounded-2xl bg-black/50 border border-white/10 p-6 sm:p-10 flex flex-col md:flex-row items-center gap-8 overflow-hidden shadow-inner">
+          {/* Dynamic Illumination Aura linked to Dimmer */}
           <div
-            className="absolute -inset-10 rounded-full blur-3xl opacity-30 transition-all duration-700 pointer-events-none"
-            style={{ backgroundColor: selectedLantern.color }}
+            className="absolute -inset-10 rounded-full blur-3xl transition-all duration-500 pointer-events-none"
+            style={{
+              backgroundColor: selectedLantern.color,
+              opacity: (luminance / 100) * 0.45,
+            }}
           />
 
-          {/* Glowing Lantern SVG Art */}
-          <div className="relative z-10 w-44 h-44 flex items-center justify-center">
+          {/* Pedestal Stage */}
+          <div className="relative z-10 w-48 h-48 flex items-center justify-center">
             <motion.div
               key={selectedLantern.id}
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4 }}
               className="relative flex items-center justify-center"
             >
               <div
-                className="w-32 h-32 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500"
+                className="w-36 h-36 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500"
                 style={{
-                  backgroundColor: `${selectedLantern.color}20`,
-                  boxShadow: `0 0 40px ${selectedLantern.color}60`,
+                  backgroundColor: `${selectedLantern.color}15`,
+                  boxShadow: `0 0 ${luminance}px ${selectedLantern.color}80`,
                   border: `2px solid ${selectedLantern.color}80`,
                 }}
               >
                 {selectedLantern.id === 'crescent-moon' && (
-                  <Moon className="w-16 h-16 animate-pulse" style={{ color: selectedLantern.color }} />
+                  <Moon className="w-20 h-20 animate-pulse" style={{ color: selectedLantern.color }} />
                 )}
                 {selectedLantern.id === 'star-jar' && (
-                  <Sparkles className="w-16 h-16 animate-pulse" style={{ color: selectedLantern.color }} />
+                  <Sparkles className="w-20 h-20 animate-pulse" style={{ color: selectedLantern.color }} />
                 )}
                 {selectedLantern.id === 'cloud-puff' && (
-                  <Cloud className="w-16 h-16 animate-pulse" style={{ color: selectedLantern.color }} />
+                  <Cloud className="w-20 h-20 animate-pulse" style={{ color: selectedLantern.color }} />
                 )}
               </div>
             </motion.div>
           </div>
 
-          {/* Handwritten Blueprint Notes */}
-          <div className="relative z-10 flex-1 space-y-3">
+          {/* Blueprint & Specs */}
+          <div className="relative z-10 flex-1 space-y-3.5">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-white/10 text-slate-300">
-                STATUS: ACTIVE EMITTER
+              <span className="text-[11px] font-mono font-bold px-3 py-0.5 rounded-full bg-white/10 text-slate-200 border border-white/10">
+                ACTIVE EMITTER
               </span>
               <span className="text-xs text-amber-200 font-mono">
                 {selectedLantern.power}
               </span>
             </div>
 
-            <h4 className="text-xl font-bold text-white font-nursery">
+            <h4 className="text-2xl font-bold text-white font-nursery">
               {selectedLantern.name}
             </h4>
 
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p className="text-sm text-slate-300 leading-relaxed font-normal">
               {selectedLantern.description}
             </p>
 
-            {/* Blueprint sketch note box */}
-            <div className="p-3.5 rounded-xl bg-indigo-950/70 border border-indigo-400/25 font-hand text-pink-200 text-sm">
-              <span className="font-bold text-amber-300">Pip's Engineering Note: </span>
+            <div className="p-4 rounded-xl bg-indigo-950/70 border border-indigo-400/30 font-hand text-pink-200 text-base shadow-sm">
+              <span className="font-bold text-amber-300">Pip's Blueprint Note: </span>
               {selectedLantern.blueprint}
             </div>
           </div>

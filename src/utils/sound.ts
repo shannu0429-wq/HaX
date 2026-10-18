@@ -1,26 +1,42 @@
-// Web Audio API Synthesizer Engine for haX.baby Track 1 (Pip)
-// 100% self-contained mathematical synthesis - no external audio files required.
+// Ultra-High Fidelity Web Audio API Engine for haX.baby Track 1 (Pip)
+// 100% self-contained mathematical synthesis - zero external audio files.
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
   private isMuted: boolean = false;
   private listeners: ((muted: boolean) => void)[] = [];
 
-  constructor() {
-    // AudioContext will be initialized on first user gesture
-  }
+  // Ambient sound nodes
+  private rainNode: AudioBufferSourceNode | null = null;
+  private rainGain: GainNode | null = null;
+  private isRainPlaying: boolean = false;
 
-  private getContext(): AudioContext | null {
+  private windNode: AudioBufferSourceNode | null = null;
+  private windGain: GainNode | null = null;
+  private isWindPlaying: boolean = false;
+
+  constructor() {}
+
+  public getContext(): AudioContext | null {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 64;
+        this.analyser.connect(this.ctx.destination);
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
     return this.ctx;
+  }
+
+  public getAnalyser(): AnalyserNode | null {
+    this.getContext();
+    return this.analyser;
   }
 
   public subscribe(listener: (muted: boolean) => void) {
@@ -36,6 +52,13 @@ class SoundEngine {
 
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
+    if (this.isMuted) {
+      if (this.rainGain) this.rainGain.gain.value = 0;
+      if (this.windGain) this.windGain.gain.value = 0;
+    } else {
+      if (this.rainGain && this.isRainPlaying) this.rainGain.gain.value = 0.08;
+      if (this.windGain && this.isWindPlaying) this.windGain.gain.value = 0.06;
+    }
     this.listeners.forEach(fn => fn(this.isMuted));
     return this.isMuted;
   }
@@ -46,56 +69,74 @@ class SoundEngine {
   }
 
   /**
-   * Play a delicate music-box chime using dual sine harmonics and an exponential decay envelope.
+   * Play music-box chime with rich celestial harmonics & connected to AnalyserNode
    */
-  public playChime(freq: number, duration: number = 1.4) {
+  public playChime(freq: number, duration: number = 1.6) {
     if (this.isMuted) return;
     const ctx = this.getContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
 
-    // Primary bell tone (Sine)
+    // Primary fundamental tone (Sine)
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
     osc1.type = 'sine';
     osc1.frequency.setValueAtTime(freq, now);
 
-    // Harmonic bell tone (Soft triangle for warmth)
+    // Harmonic bell tone (Triangle)
     const osc2 = ctx.createOscillator();
     const gain2 = ctx.createGain();
     osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(freq * 2, now);
+    osc2.frequency.setValueAtTime(freq * 2.01, now);
 
-    // Filter to soften high transients
+    // Warm undertone (Sub sine)
+    const osc3 = ctx.createOscillator();
+    const gain3 = ctx.createGain();
+    osc3.type = 'sine';
+    osc3.frequency.setValueAtTime(freq * 0.5, now);
+
+    // Filter
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(3200, now);
+    filter.frequency.setValueAtTime(3600, now);
 
-    // Envelope: sharp attack, gentle music-box shimmer decay
+    // Envelopes
     gain1.gain.setValueAtTime(0.0001, now);
-    gain1.gain.linearRampToValueAtTime(0.28, now + 0.02);
+    gain1.gain.linearRampToValueAtTime(0.3, now + 0.02);
     gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     gain2.gain.setValueAtTime(0.0001, now);
-    gain2.gain.linearRampToValueAtTime(0.08, now + 0.02);
+    gain2.gain.linearRampToValueAtTime(0.09, now + 0.02);
     gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.7));
+
+    gain3.gain.setValueAtTime(0.0001, now);
+    gain3.gain.linearRampToValueAtTime(0.06, now + 0.03);
+    gain3.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.5));
 
     osc1.connect(gain1);
     osc2.connect(gain2);
+    osc3.connect(gain3);
+
     gain1.connect(filter);
     gain2.connect(filter);
-    filter.connect(ctx.destination);
+    gain3.connect(filter);
+
+    if (this.analyser) {
+      filter.connect(this.analyser);
+    } else {
+      filter.connect(ctx.destination);
+    }
 
     osc1.start(now);
     osc2.start(now);
+    osc3.start(now);
+
     osc1.stop(now + duration);
     osc2.stop(now + duration);
+    osc3.stop(now + duration);
   }
 
-  /**
-   * Soft UI bubble click sound.
-   */
   public playClick() {
     if (this.isMuted) return;
     const ctx = this.getContext();
@@ -106,22 +147,23 @@ class SoundEngine {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(420, now);
-    osc.frequency.exponentialRampToValueAtTime(840, now + 0.06);
+    osc.frequency.setValueAtTime(540, now);
+    osc.frequency.exponentialRampToValueAtTime(1080, now + 0.05);
 
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    if (this.analyser) {
+      gain.connect(this.analyser);
+    } else {
+      gain.connect(ctx.destination);
+    }
 
     osc.start(now);
-    osc.stop(now + 0.07);
+    osc.stop(now + 0.06);
   }
 
-  /**
-   * Dream bubble pop sound (used when dropping dreams onto rooftops).
-   */
   public playBubblePop() {
     if (this.isMuted) return;
     const ctx = this.getContext();
@@ -132,64 +174,145 @@ class SoundEngine {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(700, now);
-    osc.frequency.exponentialRampToValueAtTime(280, now + 0.12);
+    osc.frequency.setValueAtTime(880, now);
+    osc.frequency.exponentialRampToValueAtTime(260, now + 0.14);
 
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    if (this.analyser) {
+      gain.connect(this.analyser);
+    } else {
+      gain.connect(ctx.destination);
+    }
 
     osc.start(now);
-    osc.stop(now + 0.12);
+    osc.stop(now + 0.14);
   }
 
-  /**
-   * Pip's signature giggle chime (Easter egg).
-   * Generates a cascading warm pentatonic laugh arpeggio.
-   */
   public playGiggle() {
     if (this.isMuted) return;
-    const notes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1174.66];
+    const notes = [523.25, 659.25, 783.99, 1046.50, 880.00, 1174.66, 1318.51];
     notes.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playChime(freq, 0.4);
-      }, idx * 75);
+        this.playChime(freq, 0.45);
+      }, idx * 65);
     });
   }
 
+  // --- AMBIENT SOUND GENERATION (100% Procedural) ---
+
   /**
-   * Soothing deep sleepy hum (when Pip naps).
+   * Generate continuous soft bedtime rain using pink noise synthesis
    */
-  public playSleepHum() {
-    if (this.isMuted) return;
+  public toggleRain(): boolean {
     const ctx = this.getContext();
-    if (!ctx) return;
+    if (!ctx) return false;
 
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
+    if (this.isRainPlaying) {
+      if (this.rainNode) {
+        try { this.rainNode.stop(); } catch {}
+        this.rainNode = null;
+      }
+      this.isRainPlaying = false;
+      return false;
+    }
+
+    // Synthesize 5 seconds of looped gentle rain noise
+    const bufferSize = ctx.sampleRate * 5;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0.0;
+
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      // Lowpass filter brown/pink noise
+      lastOut = (lastOut + 0.02 * white) / 1.02;
+      data[i] = lastOut * 3.5;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(750, ctx.currentTime);
+
     const gain = ctx.createGain();
+    gain.gain.setValueAtTime(this.isMuted ? 0 : 0.07, ctx.currentTime);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(196, now); // G3
-    osc.frequency.linearRampToValueAtTime(174.61, now + 1.2); // F3
-
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.08, now + 0.4);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
-
-    osc.connect(gain);
+    noise.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.start(now);
-    osc.stop(now + 1.8);
+    noise.start();
+    this.rainNode = noise;
+    this.rainGain = gain;
+    this.isRainPlaying = true;
+    return true;
+  }
+
+  /**
+   * Generate gentle midnight wind breeze with LFO resonance
+   */
+  public toggleWind(): boolean {
+    const ctx = this.getContext();
+    if (!ctx) return false;
+
+    if (this.isWindPlaying) {
+      if (this.windNode) {
+        try { this.windNode.stop(); } catch {}
+        this.windNode = null;
+      }
+      this.isWindPlaying = false;
+      return false;
+    }
+
+    const bufferSize = ctx.sampleRate * 6;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(320, ctx.currentTime);
+    filter.Q.setValueAtTime(3.5, ctx.currentTime);
+
+    // LFO to make wind swell gently
+    const lfo = ctx.createOscillator();
+    lfo.frequency.setValueAtTime(0.18, ctx.currentTime);
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.setValueAtTime(140, ctx.currentTime);
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start();
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(this.isMuted ? 0 : 0.06, ctx.currentTime);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noise.start();
+    this.windNode = noise;
+    this.windGain = gain;
+    this.isWindPlaying = true;
+    return true;
   }
 }
 
 export const soundEngine = new SoundEngine();
 
-// Pentatonic Dream Scale (C5, D5, E5, G5, A5, C6, D6, E6)
 export const DREAM_SCALE = [
   { note: 'C5', freq: 523.25, label: 'Star Drop', color: '#ff9ebb' },
   { note: 'D5', freq: 587.33, label: 'Moon Dew', color: '#ffd166' },

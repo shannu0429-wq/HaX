@@ -6,40 +6,78 @@
   body {
     user-select: none;
     -webkit-user-select: none;
+    background-color: #070913;
+    color: #f1f5f9;
   }
 }
 
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0c0e1e;
+  background: #070913;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b335a;
+  background: #252b48;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #ff9ebb;
 }
 
-/* Dream glow utilities */
-.glow-pink {
-  box-shadow: 0 0 25px rgba(255, 158, 187, 0.45);
-}
-.glow-star {
-  box-shadow: 0 0 25px rgba(255, 209, 102, 0.45);
-}
-.glow-moon {
-  box-shadow: 0 0 35px rgba(255, 234, 167, 0.55);
-}
-.glow-cyan {
-  box-shadow: 0 0 25px rgba(112, 214, 255, 0.45);
+/* Luxury Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(18, 22, 44, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
-/* Early web scanline / dot texture overlay */
+.glass-card {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 158, 187, 0.3);
+  box-shadow: 0 15px 40px rgba(255, 158, 187, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Aurora Borealis Ambient Flow */
+.aurora-bg {
+  background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.15), transparent 45%),
+              radial-gradient(circle at 80% 30%, rgba(236, 72, 153, 0.12), transparent 40%),
+              radial-gradient(circle at 20% 60%, rgba(56, 189, 248, 0.1), transparent 45%);
+}
+
+/* Shimmer gradient text */
+.text-shimmer {
+  background: linear-gradient(90deg, #ffffff 0%, #ffeaa7 25%, #ff9ebb 50%, #70d6ff 75%, #ffffff 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shine 6s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Retro Scanlines / Star Dust Texture */
 .retro-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
-  background-size: 20px 20px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Metallic Brass Gradient for Odometer */
+.metallic-gold {
+  background: linear-gradient(135deg, #fce043 0%, #fb7ba2 100%);
 }

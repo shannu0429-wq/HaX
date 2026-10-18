@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SparkleTrail } from './components/SparkleTrail';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { AmbientSoundMachine } from './components/AmbientSoundMachine';
 import { LullabyLab } from './components/LullabyLab';
 import { NightlightGallery } from './components/NightlightGallery';
 import { DreamDeliveryMap } from './components/DreamDeliveryMap';
@@ -17,12 +18,10 @@ export function App() {
   const [isSleeping, setIsSleeping] = useState<boolean>(false);
   const [showEasterEgg, setShowEasterEgg] = useState<boolean>(false);
 
-  // Increment dream odometer on user actions
   const incrementDream = () => {
     setDreamCount((prev) => prev + 1);
   };
 
-  // Easter egg bow trigger
   const handleBowEasterEgg = () => {
     setIsSleeping(true);
     setShowEasterEgg(true);
@@ -43,14 +42,15 @@ export function App() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-700 relative ${
+      className={`min-h-screen transition-colors duration-700 relative overflow-x-hidden ${
         isDaytime
-          ? 'bg-gradient-to-b from-[#242b56] via-[#1a1f3d] to-[#0c0e1e] text-slate-100'
-          : 'bg-[#0c0e1e] text-slate-100'
+          ? 'bg-gradient-to-b from-[#1b2144] via-[#121633] to-[#070913] text-slate-100'
+          : 'bg-[#070913] text-slate-100'
       }`}
     >
-      {/* Background Star Texture / Retro Dots */}
+      {/* Background Star Texture / Retro Dots & Ambient Aurora */}
       <div className="fixed inset-0 pointer-events-none retro-dots opacity-40 z-0" />
+      <div className="fixed inset-0 pointer-events-none aurora-bg opacity-30 z-0" />
 
       {/* Sparkle Cursor Trail (+2 pt bonus) */}
       <SparkleTrail />
@@ -65,7 +65,7 @@ export function App() {
 
       {/* Main Content Sanctuary */}
       <main className="relative z-10 space-y-8">
-        {/* Hero Section */}
+        {/* Hero Section with 3D Parallax Pip */}
         <Hero
           isSleeping={isSleeping}
           onWakeUp={handleWakeUp}
@@ -75,16 +75,19 @@ export function App() {
           onWishClick={() => scrollToSection('dream-jar')}
         />
 
+        {/* Ambient Procedural Sleep Soundscape (Rain & Wind) */}
+        <AmbientSoundMachine />
+
         {/* Story Vignettes (Origin & Journey) */}
         <StoryVignettes />
 
-        {/* Project 1: The Lullaby Lab */}
+        {/* Project 1: The Lullaby Lab with Live Spectrum Visualizer */}
         <LullabyLab onInteract={incrementDream} />
 
-        {/* Project 2: Nightlight Collection */}
+        {/* Project 2: Nightlight Collection with Dimmer Slider */}
         <NightlightGallery onInteract={incrementDream} />
 
-        {/* Project 3: Dream Delivery Rooftops */}
+        {/* Project 3: Dream Delivery Rooftops Game */}
         <DreamDeliveryMap onDeliverDream={incrementDream} />
 
         {/* Side Quest: Dream Jar Guestbook (+2 pts) */}

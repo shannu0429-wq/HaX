@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { PipCharacter } from './PipCharacter';
-import { Music, Sparkles, Send, Heart } from 'lucide-react';
+import { Music, Sparkles, Send, Heart, ShieldCheck, Compass } from 'lucide-react';
 import { soundEngine } from '../utils/sound';
 
 interface HeroProps {
@@ -22,7 +22,10 @@ export const Hero: React.FC<HeroProps> = ({
   onWishClick,
 }) => {
   return (
-    <section className="relative pt-6 pb-16 px-4 md:px-8 max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+    <section className="relative pt-8 pb-16 px-4 md:px-8 max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+      {/* Background radial highlight */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
       {/* Left Column: Identity & Bio */}
       <motion.div
         initial={{ opacity: 0, x: -30 }}
@@ -31,21 +34,23 @@ export const Hero: React.FC<HeroProps> = ({
         className="flex-1 text-center lg:text-left z-10"
       >
         {/* Status Chip */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-900/60 border border-indigo-400/30 text-xs font-semibold text-pink-300 mb-4 backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card text-xs font-semibold text-pink-300 mb-5 border border-pink-400/30 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>Midnight Nursery · Starlight Shift</span>
+          <span className="text-slate-200">Midnight Nursery</span>
+          <span className="text-slate-500">|</span>
+          <span className="text-amber-300 font-mono">Shift 01</span>
         </div>
 
         {/* Name and Title */}
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white font-nursery leading-tight">
-          Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-amber-200 to-cyan-300">Pip!</span>
+        <h1 className="text-5xl sm:text-7xl font-black tracking-tight text-white font-nursery leading-[1.08]">
+          Hi, I'm <span className="text-shimmer">Pip!</span>
         </h1>
-        <p className="text-lg sm:text-xl font-medium text-amber-200/90 mt-2">
+        <p className="text-xl sm:text-2xl font-bold text-amber-200/90 mt-2 font-nursery">
           Junior Dream Engineer
         </p>
 
         {/* Tagline */}
-        <blockquote className="my-5 py-2 px-4 border-l-4 border-pink-400 bg-white/5 rounded-r-xl italic text-slate-200 text-sm sm:text-base font-hand">
+        <blockquote className="my-6 py-3 px-5 border-l-4 border-pink-400 glass-card rounded-r-2xl italic text-slate-100 text-base sm:text-lg font-hand shadow-inner">
           "I build the dreams you fall asleep inside."
         </blockquote>
 
@@ -57,16 +62,16 @@ export const Hero: React.FC<HeroProps> = ({
         </p>
 
         {/* Call to Actions */}
-        <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+        <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3.5">
           <button
             onClick={() => {
               soundEngine.playClick();
               onExploreClick();
             }}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 via-indigo-600 to-indigo-700 text-white font-bold text-sm shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40 hover:scale-105 active:scale-95 transition-all"
+            className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-pink-500 via-indigo-600 to-indigo-700 text-white font-bold text-sm shadow-[0_0_30px_rgba(236,72,153,0.35)] hover:shadow-[0_0_40px_rgba(236,72,153,0.5)] hover:scale-105 active:scale-95 transition-all"
           >
             <Music className="w-4 h-4 text-amber-200" />
-            <span>Play Lullaby Lab</span>
+            <span>Enter Lullaby Lab</span>
           </button>
 
           <button
@@ -74,31 +79,31 @@ export const Hero: React.FC<HeroProps> = ({
               soundEngine.playClick();
               onWishClick();
             }}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-sm border border-white/20 hover:border-pink-300/40 active:scale-95 transition-all"
+            className="flex items-center gap-2 px-7 py-3.5 rounded-full glass-card hover:bg-white/10 text-slate-200 font-semibold text-sm border border-white/20 hover:border-pink-300/40 active:scale-95 transition-all shadow-lg"
           >
             <Send className="w-4 h-4 text-pink-300" />
-            <span>Drop a Dream Wish</span>
+            <span>Bottle a Dream Wish</span>
           </button>
         </div>
 
-        {/* Quick Fun Stats / Early-Web Mini-Badges */}
-        <div className="mt-8 grid grid-cols-3 gap-2 max-w-sm mx-auto lg:mx-0 pt-4 border-t border-white/10 text-center">
-          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-            <div className="text-xs text-slate-400">Favorite Toy</div>
-            <div className="text-xs font-bold text-amber-200">Star Rattle</div>
+        {/* Quick Fun Stats / Luxury Bento Badges */}
+        <div className="mt-8 grid grid-cols-3 gap-3 max-w-md mx-auto lg:mx-0 pt-6 border-t border-white/10 text-center">
+          <div className="p-3 rounded-2xl glass-card">
+            <div className="text-[11px] text-slate-400 font-medium">Favorite Toy</div>
+            <div className="text-xs sm:text-sm font-bold text-amber-200 mt-0.5">Star Rattle</div>
           </div>
-          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-            <div className="text-xs text-slate-400">Nemesis</div>
-            <div className="text-xs font-bold text-pink-300">Alarm Clocks</div>
+          <div className="p-3 rounded-2xl glass-card">
+            <div className="text-[11px] text-slate-400 font-medium">Nemesis</div>
+            <div className="text-xs sm:text-sm font-bold text-pink-300 mt-0.5">Alarm Clocks</div>
           </div>
-          <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-            <div className="text-xs text-slate-400">Superpower</div>
-            <div className="text-xs font-bold text-cyan-300">Giggle Chimes</div>
+          <div className="p-3 rounded-2xl glass-card">
+            <div className="text-[11px] text-slate-400 font-medium">Superpower</div>
+            <div className="text-xs sm:text-sm font-bold text-cyan-300 mt-0.5">Giggle Chimes</div>
           </div>
         </div>
       </motion.div>
 
-      {/* Right Column: Pip Character */}
+      {/* Right Column: Pip 3D Character */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
